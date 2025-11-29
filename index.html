@@ -8,6 +8,10 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <link rel="stylesheet" href="style.css" />
     <script defer src="script.js"></script>
@@ -17,8 +21,7 @@
       <header>
         <h1 class="logo">Country Finder</h1>
         <button class="theme-toggle" aria-label="Toggle dark mode">
-          <span class="theme-icon">🌙</span>
-          <span class="theme-text">Dark Mode</span>
+          <i class="fa-solid fa-moon theme-icon"></i>
         </button>
       </header>
 
@@ -29,27 +32,29 @@
         </p>
 
         <form class="search-form" role="search">
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Search for any country..."
-            aria-label="Country name"
-            required
-          />
+          <div class="input-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search for any country..."
+              aria-label="Country name"
+              required
+            />
+          </div>
           <button
-            class="btn btn-primary"
+            class="btn btn-primary search-btn"
             type="submit"
             aria-label="Search country"
           >
-            <span class="btn-icon">🔍</span>
-            <span>Search</span>
+            Search
           </button>
         </form>
 
         <div class="divider">OR</div>
 
         <button class="btn btn-secondary" aria-label="Use current location">
-          <span class="btn-icon">📍</span>
+          <i class="fa-solid fa-location-crosshairs"></i>
           <span>Use My Location</span>
         </button>
       </section>
@@ -59,7 +64,5 @@
     </div>
 
     <div class="error-message" role="alert" aria-live="assertive"></div>
-
-    <script></script>
   </body>
 </html>
