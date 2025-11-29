@@ -313,6 +313,7 @@ header {
   background-color: var(--bg-card-front);
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .country__img-wrapper {
@@ -358,7 +359,7 @@ header {
   border-radius: 20px;
 }
 
-.country__flip-hint {
+/* .country__flip-hint {
   margin-top: auto;
   font-size: 1.2rem;
   color: var(--text-muted);
@@ -369,6 +370,32 @@ header {
   background: rgba(0, 0, 0, 0.03);
   padding: 0.5rem 1.2rem;
   border-radius: 20px;
+} */
+
+/* THE HINT STYLES */
+.country__flip-hint {
+  /* Pushes the element to the very bottom of the flex container */
+  margin-top: auto;
+
+  /* Visual Styles */
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  text-align: center;
+  gap: 0.8rem;
+  opacity: 0.8;
+  background: rgba(0, 0, 0, 0.05); /* Slightly darker for visibility */
+  padding: 0.8rem 1.5rem;
+  border-radius: 20px;
+
+  /* Add margin bottom so it doesn't touch the card edge */
+  margin-bottom: 1.5rem;
+}
+
+span {
+  font-size: 1.4rem;
+  text-align: center;
 }
 
 /* BACK FACE */
@@ -587,14 +614,12 @@ header {
     min-width: 140px;
   }
 
-  /* --- 3. CARD SIZING & CENTERING --- */
+  /* --- CARD SIZING UPDATE --- */
   .country {
-    /* Reduce width to 80% of the screen */
     width: 80%;
-    /* Center the card horizontally */
     margin: 0 auto;
-    /* Adjust height to maintain aspect ratio with narrower width */
-    height: 400px;
+    /* INCREASED HEIGHT HERE */
+    height: 450px;
   }
 
   /* Ensure the inner part fills the new smaller parent */
