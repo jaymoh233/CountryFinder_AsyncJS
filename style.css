@@ -264,7 +264,7 @@ header {
 .country {
   width: 100%;
   max-width: 340px;
-  height: 480px;
+  height: 600px;
   perspective: 1500px;
   opacity: 0;
   cursor: pointer; /* Indicates it's interactive */
@@ -402,19 +402,31 @@ span {
   text-align: center;
 }
 
-/* BACK FACE */
 .country__back {
   background-color: var(--bg-card-back);
   color: var(--text-main);
   transform: rotateY(180deg);
-  padding: 3rem;
+  padding: 2.5rem; /* Slightly reduced padding */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 2rem;
+  /* CHANGED: Start from top instead of centering */
+  justify-content: flex-start;
+  gap: 1.5rem; /* Reduced gap slightly */
   border: 1px solid var(--border-light);
+
+  /* SAFETY: Adds a scrollbar if the list of neighbors is huge */
+  overflow-y: auto;
+  scrollbar-width: thin; /* For Firefox */
 }
 
+/* Optional: Style the scrollbar for Webkit browsers */
+.country__back::-webkit-scrollbar {
+  width: 6px;
+}
+.country__back::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
 .country__back-header {
   text-align: center;
   padding-bottom: 1.5rem;
@@ -492,7 +504,7 @@ span {
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
-  margin-top: 1.5rem;
+  margin-top: auto;
   width: 100%;
   padding: 1rem;
   background-color: rgba(74, 144, 226, 0.1);
@@ -575,20 +587,16 @@ span {
 }
 
 /* ==========================================
-       MOBILE RESPONSIVENESS (UPDATED)
+       MOBILE RESPONSIVENESS (FINAL FIX)
    ========================================== */
 @media (max-width: 768px) {
   .container {
     padding: 1.5rem;
   }
 
-  .btn-map {
-    margin-bottom: 1rem;
-  }
-
   /* --- 1. Header & Layout Spacing --- */
   header {
-    margin-bottom: 5rem;
+    margin-bottom: 4rem;
   }
 
   .search-title {
@@ -614,66 +622,532 @@ span {
     width: auto;
     padding: 1.25rem 3rem;
     font-size: 1.4rem;
-    height: auto; /* Let padding define height */
+    height: auto;
     min-width: 140px;
   }
 
-  /* --- CARD SIZING UPDATE --- */
+  /* --- 3. CARD SIZING --- */
   .country {
-    width: 80%;
+    width: 85%;
     margin: 0 auto;
-    /* INCREASED HEIGHT HERE */
-    height: 450px;
+    /* Slightly reduced height to minimize empty space */
+    height: 550px;
   }
 
-  /* Ensure the inner part fills the new smaller parent */
   .country__inner {
     width: 100%;
     height: 100%;
   }
 
-  /* --- 4. RESIZING INTERNAL ELEMENTS TO FIT --- */
-
-  /* Front Side Adjustments */
+  /* --- 4. INTERNAL ELEMENTS --- */
+  /* Front Side */
   .country__front-content {
-    padding: 1.5rem; /* Reduce padding */
+    padding: 1rem;
   }
 
   .country__name {
-    font-size: 2.2rem; /* Smaller Title */
+    font-size: 2.4rem;
+    margin-bottom: 0.5rem;
   }
 
   .country__region {
-    font-size: 1.1rem;
-    padding: 0.4rem 1.2rem;
+    font-size: 1.2rem;
+    padding: 0.5rem 1.5rem;
   }
 
-  /* Back Side Adjustments */
+  /* Back Side */
   .country__back {
-    padding: 2rem; /* Less padding on back */
+    padding: 2rem;
+    overflow-y: auto; /* Safety scroll */
+    justify-content: flex-start; /* Stack from top */
+    padding-top: 2.5rem;
+  }
+
+  .country__back-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
   }
 
   .country__back-title {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
 
   .country__row {
-    padding: 1rem; /* Compact rows */
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
   }
 
-  .country__row-label {
-    font-size: 1.2rem;
-  }
-
-  .country__row-value {
-    font-size: 1.4rem;
+  /* --- 5. THE FIX FOR THE BUTTON SPACE --- */
+  .btn-map {
+    /* REMOVED: margin-top: auto (which pushed it to bottom) */
+    /* ADDED: Fixed margin to sit right below neighbors */
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding: 1.2rem;
+    flex-shrink: 0; /* Prevents button from getting squashed */
   }
 
   /* Neighbour Adjustment */
   .neighbour {
     transform: scale(1);
-    /* Ensure neighbor card follows same sizing rules */
-    width: 80%;
+    width: 85%;
     margin-top: 3rem;
+  }
+}
+
+/* ==========================================
+      NEIGHBOUR CHIPS (NEW)
+   ========================================== */
+.country__neighbours-container {
+  margin-top: 1.5rem;
+  text-align: center;
+  width: 100%;
+}
+
+.country__neighbours-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.country__neighbours-list {
+  display: flex;
+  flex-wrap: wrap; /* Allows chips to stack if there are many */
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.neighbour-chip {
+  background-color: rgba(74, 144, 226, 0.1);
+  color: var(--accent-color);
+  border: 1px solid transparent;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.neighbour-chip:hover {
+  background-color: var(--accent-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.2);
+}
+
+/* Island State (No borders) */
+.no-borders {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+/* ==========================================
+      SEARCH HISTORY (NEW)
+   ========================================== */
+.search-history-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  opacity: 0; /* Hidden by default until JS loads history */
+  transition: opacity 0.3s ease;
+  min-height: 3rem; /* Prevent layout jump */
+}
+
+.search-history-container.visible {
+  opacity: 1;
+}
+
+.history-label {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.history-chip {
+  background: var(--bg-card-front);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  padding: 0.4rem 1rem;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.history-chip:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+.btn-clear-history {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  transition: color 0.2s;
+}
+
+.btn-clear-history:hover {
+  color: #ff6b6b; /* Red on hover */
+}
+
+/* ==========================================
+      HEADER CONTROLS
+   ========================================== */
+.header-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.btn-toggle-sidebar {
+  background: transparent;
+  border: 2px solid var(--border-light);
+  color: var(--text-main);
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  transition: all 0.3s ease;
+}
+
+.btn-toggle-sidebar:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  background: rgba(74, 144, 226, 0.1);
+}
+
+/* ==========================================
+      SIDEBAR (DRAWER) STYLES
+   ========================================== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 100vh;
+  background-color: var(--bg-card-front);
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 2000;
+  transform: translateX(-100%); /* Hidden by default */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* Overlay (Dark background when sidebar is open) */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1500;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Sidebar Internal Layout */
+.sidebar-header {
+  padding: 2rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-header h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  color: var(--text-main);
+}
+
+.btn-close-sidebar {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-close-sidebar:hover {
+  color: var(--accent-color);
+}
+
+.sidebar-content {
+  flex: 1; /* Takes remaining height */
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.history-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.history-item {
+  padding: 1.2rem;
+  background: var(--bg-body);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  color: var(--text-main);
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-item:hover {
+  background: var(--accent-color);
+  color: white;
+  transform: translateX(5px);
+}
+
+.history-item::after {
+  content: '➜';
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.history-item:hover::after {
+  opacity: 1;
+}
+
+.empty-msg {
+  text-align: center;
+  margin-top: 3rem;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  font-style: italic;
+  display: none; /* JS toggles this */
+}
+
+.sidebar-footer {
+  padding: 2rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.btn-clear-history {
+  width: 100%;
+  padding: 1.2rem;
+  background: #ff6b6b15; /* Light Red */
+  color: #ff6b6b;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  transition: all 0.2s;
+}
+
+.btn-clear-history:hover {
+  background: #ff6b6b;
+  color: white;
+}
+
+/* ==========================================
+      MAP MODAL (NEW)
+   ========================================== */
+.map-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 1000px;
+  height: 80vh; /* Takes up 80% of screen height */
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  z-index: 3000;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  opacity: 1;
+  visibility: visible;
+}
+
+.map-modal.hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -40%); /* Slide up effect when hiding */
+}
+
+/* The actual map container needs a height */
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+.btn-close-map {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: white;
+  border: none;
+  font-size: 3rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 3001; /* Must be above the map layers */
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.btn-close-map:hover {
+  background: #ff6b6b;
+  color: white;
+  transform: rotate(90deg);
+}
+
+.map-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 2500;
+  transition: all 0.3s;
+}
+
+.map-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ==========================================
+      WEATHER BADGE (NEW)
+   ========================================== */
+.weather-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.6); /* Dark semi-transparent */
+  backdrop-filter: blur(4px);
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.weather-temp {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.weather-icon {
+  font-size: 1.6rem;
+  color: #f1c40f; /* Sunny Yellow */
+}
+
+/* Add a specific animation for the badge */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================
+      VOICE SEARCH (NEW)
+   ========================================== */
+.btn-voice {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  color: var(--text-muted);
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-voice:hover {
+  color: var(--accent-color);
+  background-color: rgba(74, 144, 226, 0.1);
+}
+
+/* Animation class added by JS when listening */
+.btn-voice.listening {
+  color: #e74c3c; /* Red to indicate recording */
+  animation: pulse 1.5s infinite;
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
   }
 }
