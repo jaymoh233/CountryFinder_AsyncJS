@@ -594,6 +594,13 @@ span {
     padding: 1.5rem;
   }
 
+  .weather-badge {
+    /* This ensures the element is invisible when turned around */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(1px);
+  }
+
   /* --- 1. Header & Layout Spacing --- */
   header {
     margin-bottom: 4rem;
