@@ -847,6 +847,7 @@ span {
   left: 0;
   width: 300px;
   height: 100vh;
+  height: 100dvh;
   background-color: var(--bg-card-front);
   box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
   z-index: 2000;
@@ -963,6 +964,8 @@ span {
 .sidebar-footer {
   padding: 2rem;
   border-top: 1px solid var(--border-light);
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  flex-shrink: 0;
 }
 
 .btn-clear-history {
@@ -1084,6 +1087,11 @@ span {
   z-index: 10;
   border: 1px solid rgba(255, 255, 255, 0.2);
   animation: fadeIn 0.5s ease-out;
+
+  /* This ensures the element is invisible when turned around */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(1px);
 }
 
 .weather-temp {
