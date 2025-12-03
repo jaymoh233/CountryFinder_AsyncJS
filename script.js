@@ -19,7 +19,7 @@
 // const btnClearHistory = document.querySelector('.btn-clear-history');
 // const emptyMsg = document.querySelector('.empty-msg');
 
-// // Map Selectors (NEW)
+// // Map Selectors
 // const mapModal = document.querySelector('.map-modal');
 // const mapOverlay = document.querySelector('.map-overlay');
 // const btnCloseMap = document.querySelector('.btn-close-map');
@@ -48,7 +48,7 @@
 
 // // 3. FLIP LOGIC
 // countriesContainer.addEventListener('click', function (e) {
-//   // Don't flip if clicking buttons
+//   // Don't flip if clicking buttons or chips
 //   if (e.target.closest('.neighbour-chip') || e.target.closest('.btn-map'))
 //     return;
 
@@ -57,31 +57,24 @@
 //   card.classList.toggle('flipped');
 // });
 
-// // 4. MAP LOGIC (NEW LEAFLET INTEGRATION)
+// // 4. MAP LOGIC (LEAFLET INTEGRATION)
 // let map; // Global variable to hold the map instance
 
 // const openMap = (lat, lng, zoom = 6) => {
-//   // 1. Show Modal
 //   mapModal.classList.remove('hidden');
 //   mapOverlay.classList.remove('hidden');
 
-//   // 2. If a map already exists, remove it (Cleanup)
 //   if (map) {
 //     map.remove();
 //   }
 
-//   // 3. Create new map instance
-//   // 'map' refers to the ID in the HTML <div id="map">
 //   map = L.map('map').setView([lat, lng], zoom);
 
-//   // 4. Add Tile Layer (The visual map)
-//   // Using OpenStreetMap (free & open source)
 //   L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
 //     attribution:
 //       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 //   }).addTo(map);
 
-//   // 5. Add Marker
 //   L.marker([lat, lng]).addTo(map).bindPopup('Center of Country').openPopup();
 // };
 
@@ -99,7 +92,36 @@
 //   }
 // });
 
-// // 5. UTILITY FUNCTIONS
+// // 5. WEATHER API LOGIC (NEW)
+// const getWeatherIcon = code => {
+//   if (code === 0) return '☀️'; // Clear sky
+//   if (code >= 1 && code <= 3) return '⛅'; // Partly cloudy
+//   if (code >= 45 && code <= 48) return '🌫️'; // Fog
+//   if (code >= 51 && code <= 67) return '🌧️'; // Rain
+//   if (code >= 71 && code <= 77) return '❄️'; // Snow
+//   if (code >= 80 && code <= 82) return '🌦️'; // Rain showers
+//   if (code >= 95) return '⚡'; // Thunderstorm
+//   return '🌡️'; // Default
+// };
+
+// const getWeather = async (lat, lng) => {
+//   try {
+//     const res = await fetch(
+//       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true`
+//     );
+//     const data = await res.json();
+//     return {
+//       temp: data.current_weather.temperature,
+//       code: data.current_weather.weathercode,
+//       icon: getWeatherIcon(data.current_weather.weathercode),
+//     };
+//   } catch (err) {
+//     console.error('Weather fetch failed', err);
+//     return null; // Fail gracefully
+//   }
+// };
+
+// // 6. UTILITY FUNCTIONS
 // const showLoading = () => loadingSpinner?.classList.add('visible');
 // const hideLoading = () => loadingSpinner?.classList.remove('visible');
 
@@ -137,8 +159,8 @@
 //   return map[input.toLowerCase()] || input;
 // };
 
-// // 6. RENDER COUNTRY CARD
-// const renderCountry = (data, className = '') => {
+// // 7. RENDER COUNTRY CARD (Updated with Weather Badge)
+// const renderCountry = (data, weather = null, className = '') => {
 //   const lang = data.languages ? Object.values(data.languages)[0] : 'N/A';
 
 //   let curr = data.currencies ? Object.values(data.currencies)[0].name : 'N/A';
@@ -149,6 +171,17 @@
 //   const driveSide = data.car.side
 //     ? data.car.side.charAt(0).toUpperCase() + data.car.side.slice(1)
 //     : 'N/A';
+
+//   // --- WEATHER HTML GENERATION ---
+//   let weatherHTML = '';
+//   if (weather) {
+//     weatherHTML = `
+//         <div class="weather-badge">
+//             <span class="weather-icon">${weather.icon}</span>
+//             <span class="weather-temp">${weather.temp}°C</span>
+//         </div>
+//       `;
+//   }
 
 //   // --- NEIGHBOR CHIPS ---
 //   let neighboursHTML = '';
@@ -171,7 +204,6 @@
 //   }
 
 //   // --- HTML GENERATION ---
-//   // Notice the button now has data-lat and data-lng attributes!
 //   const html = `
 //     <article class="country ${className}">
 //       <div class="country__inner">
@@ -180,6 +212,9 @@
 //             <img class="country__img" src="${
 //               data.flags.svg || data.flags.png
 //             }" alt="Flag of ${data.name.common}" loading="lazy" />
+
+//             ${weatherHTML}
+
 //           </div>
 //           <div class="country__front-content">
 //              <div style="font-size: 4rem;">${data.flag || '🏳️'}</div>
@@ -240,26 +275,25 @@
 //   countriesContainer.classList.add('visible');
 // };
 
-// // 7. HANDLE MAP BUTTON CLICKS
+// // 8. HANDLE MAP BUTTON CLICKS
 // countriesContainer.addEventListener('click', function (e) {
 //   const btn = e.target.closest('.btn-map');
 //   if (!btn) return;
 
-//   // Get coordinates from the button
 //   const lat = btn.dataset.lat;
 //   const lng = btn.dataset.lng;
 
 //   openMap(lat, lng);
 // });
 
-// // 8. NEIGHBOR CHIP CLICK LOGIC
+// // 9. NEIGHBOR CHIP CLICK LOGIC
 // countriesContainer.addEventListener('click', function (e) {
 //   const btn = e.target.closest('.neighbour-chip');
 //   if (!btn) return;
 //   getCountryData(btn.dataset.country);
 // });
 
-// // 9. FETCH LOGIC
+// // 10. FETCH LOGIC (With Weather Chaining)
 // const getCountryData = async input => {
 //   try {
 //     clearUI();
@@ -278,6 +312,7 @@
 //     const data = await res.json();
 //     let countryData = data[0];
 
+//     // Smart Selection Logic
 //     if (data.length > 1) {
 //       const exactMatch = data.find(
 //         c => c.name.common.toLowerCase() === alias.toLowerCase()
@@ -289,8 +324,14 @@
 //       else if (altMatch) countryData = altMatch;
 //     }
 
+//     // --- API CHAINING: GET WEATHER ---
+//     const [lat, lng] = countryData.latlng;
+//     const weatherData = await getWeather(lat, lng);
+
 //     hideLoading();
-//     renderCountry(countryData);
+//     // Render with weather data
+//     renderCountry(countryData, weatherData);
+
 //     addToHistory(countryData.name.common); // Add to history
 
 //     searchInput.value = '';
@@ -300,7 +341,7 @@
 //   }
 // };
 
-// // 10. HISTORY & SIDEBAR LOGIC
+// // 11. HISTORY & SIDEBAR LOGIC
 // const openSidebar = () => {
 //   sidebar.classList.add('open');
 //   overlay.classList.add('open');
@@ -372,23 +413,80 @@
 // btnOpenSidebar?.addEventListener('click', openSidebar);
 // btnCloseSidebar?.addEventListener('click', closeSidebar);
 // overlay?.addEventListener('click', closeSidebar);
+
+// // History Click
 // historyList?.addEventListener('click', e => {
 //   if (e.target.classList.contains('history-item')) {
 //     getCountryData(e.target.textContent);
 //     closeSidebar();
 //   }
 // });
+
 // btnClearHistory?.addEventListener('click', () => {
 //   searchHistory = [];
 //   localStorage.removeItem('searchHistory');
 //   renderHistory();
 // });
 
+// // ==========================================
+// // 12. VOICE SEARCH LOGIC
+// // ==========================================
+// const btnVoice = document.querySelector('.btn-voice');
+
+// // Check if browser supports Speech Recognition
+// const SpeechRecognition =
+//   window.SpeechRecognition || window.webkitSpeechRecognition;
+
+// if (SpeechRecognition) {
+//   const recognition = new SpeechRecognition();
+//   recognition.continuous = false; // Stop after one sentence
+//   recognition.lang = 'en-US';
+//   recognition.interimResults = false;
+
+//   // Start Listening
+//   btnVoice.addEventListener('click', () => {
+//     recognition.start();
+//   });
+
+//   // visual feedback: Microphone turns red/pulses
+//   recognition.onstart = () => {
+//     btnVoice.classList.add('listening');
+//     searchInput.placeholder = 'Listening... Speak now';
+//   };
+
+//   // When speech ends
+//   recognition.onend = () => {
+//     btnVoice.classList.remove('listening');
+//     searchInput.placeholder = 'Search for any country...';
+//   };
+
+//   // Capture result
+//   recognition.onresult = e => {
+//     const transcript = e.results[0][0].transcript;
+
+//     // Clean up the text (remove periods, trim)
+//     const cleanQuery = transcript.replace('.', '').trim();
+
+//     // Put text in input and trigger search
+//     searchInput.value = cleanQuery;
+//     getCountryData(cleanQuery);
+//   };
+
+//   // Error handling
+//   recognition.onerror = e => {
+//     console.error('Voice error', e.error);
+//     btnVoice.classList.remove('listening');
+//     searchInput.placeholder = 'Error. Please type instead.';
+//   };
+// } else {
+//   // Hide button if browser doesn't support it (e.g. Firefox desktop)
+//   if (btnVoice) btnVoice.style.display = 'none';
+// }
+
 // // Initialize
 // initTheme();
 // renderHistory();
 
-//
 'use strict';
 
 // 1. SELECTORS
@@ -550,7 +648,7 @@ const checkCommonAliases = input => {
   return map[input.toLowerCase()] || input;
 };
 
-// 7. RENDER COUNTRY CARD (Updated with Weather Badge)
+// 7. RENDER COUNTRY CARD
 const renderCountry = (data, weather = null, className = '') => {
   const lang = data.languages ? Object.values(data.languages)[0] : 'N/A';
 
@@ -684,7 +782,7 @@ countriesContainer.addEventListener('click', function (e) {
   getCountryData(btn.dataset.country);
 });
 
-// 10. FETCH LOGIC (With Weather Chaining)
+// 10. FETCH LOGIC
 const getCountryData = async input => {
   try {
     clearUI();
@@ -720,7 +818,6 @@ const getCountryData = async input => {
     const weatherData = await getWeather(lat, lng);
 
     hideLoading();
-    // Render with weather data
     renderCountry(countryData, weatherData);
 
     addToHistory(countryData.name.common); // Add to history
@@ -819,8 +916,69 @@ btnClearHistory?.addEventListener('click', () => {
   renderHistory();
 });
 
+// // ==========================================
+// // 12. VOICE SEARCH LOGIC (UPDATED WITH TOGGLE)
+// // ==========================================
+// const btnVoice = document.querySelector('.btn-voice');
+
+// // Check if browser supports Speech Recognition
+// const SpeechRecognition =
+//   window.SpeechRecognition || window.webkitSpeechRecognition;
+
+// if (SpeechRecognition) {
+//   const recognition = new SpeechRecognition();
+//   recognition.continuous = false; // Stop after one sentence
+//   recognition.lang = 'en-US';
+//   recognition.interimResults = false;
+
+//   // UPDATED: Click acts as a Toggle (Start / Stop)
+//   btnVoice.addEventListener('click', () => {
+//     // Check if it's currently listening by checking the class
+//     if (btnVoice.classList.contains('listening')) {
+//       recognition.stop();
+//     } else {
+//       recognition.start();
+//     }
+//   });
+
+//   // Visual feedback: Microphone turns red/pulses
+//   recognition.onstart = () => {
+//     btnVoice.classList.add('listening');
+//     searchInput.placeholder = 'Listening... Speak now';
+//   };
+
+//   // When speech ends (Automatically or Manual Stop)
+//   recognition.onend = () => {
+//     btnVoice.classList.remove('listening');
+//     searchInput.placeholder = 'Search for any country...';
+//   };
+
+//   // Capture result
+//   recognition.onresult = e => {
+//     const transcript = e.results[0][0].transcript;
+
+//     // Clean up the text (remove periods, trim)
+//     const cleanQuery = transcript.replace('.', '').trim();
+
+//     // Put text in input and trigger search
+//     searchInput.value = cleanQuery;
+//     getCountryData(cleanQuery);
+//   };
+
+//   // Error handling
+//   recognition.onerror = e => {
+//     console.error('Voice error', e.error);
+//     btnVoice.classList.remove('listening');
+//     searchInput.placeholder = 'Error. Please type instead.';
+//   };
+// } else {
+//   // Hide button if browser doesn't support it (e.g. Firefox desktop)
+//   if (btnVoice) btnVoice.style.display = 'none';
+// }
+
+// Initialize
 // ==========================================
-// 12. VOICE SEARCH LOGIC
+// 12. VOICE SEARCH LOGIC (ROBUST VERSION)
 // ==========================================
 const btnVoice = document.querySelector('.btn-voice');
 
@@ -830,50 +988,70 @@ const SpeechRecognition =
 
 if (SpeechRecognition) {
   const recognition = new SpeechRecognition();
-  recognition.continuous = false; // Stop after one sentence
+  recognition.continuous = false;
   recognition.lang = 'en-US';
   recognition.interimResults = false;
 
-  // Start Listening
+  // Toggle Start/Stop
   btnVoice.addEventListener('click', () => {
-    recognition.start();
+    if (btnVoice.classList.contains('listening')) {
+      recognition.stop();
+    } else {
+      recognition.start();
+    }
   });
 
-  // visual feedback: Microphone turns red/pulses
+  // Start: Visual feedback
   recognition.onstart = () => {
     btnVoice.classList.add('listening');
+    searchInput.value = '';
     searchInput.placeholder = 'Listening... Speak now';
   };
 
-  // When speech ends
+  // End: Reset UI
   recognition.onend = () => {
     btnVoice.classList.remove('listening');
-    searchInput.placeholder = 'Search for any country...';
+    // We only reset placeholder if it wasn't changed by an error
+    if (
+      !searchInput.placeholder.includes('Error') &&
+      !searchInput.placeholder.includes("Didn't")
+    ) {
+      searchInput.placeholder = 'Search for any country...';
+    }
   };
 
-  // Capture result
+  // Result: Capture text
   recognition.onresult = e => {
     const transcript = e.results[0][0].transcript;
-
-    // Clean up the text (remove periods, trim)
     const cleanQuery = transcript.replace('.', '').trim();
 
-    // Put text in input and trigger search
     searchInput.value = cleanQuery;
     getCountryData(cleanQuery);
   };
 
-  // Error handling
+  // Error Handling (The Fix)
   recognition.onerror = e => {
-    console.error('Voice error', e.error);
     btnVoice.classList.remove('listening');
-    searchInput.placeholder = 'Error. Please type instead.';
+
+    if (e.error === 'no-speech') {
+      // User didn't say anything
+      searchInput.placeholder = "Didn't hear anything. Try again.";
+    } else if (e.error === 'audio-capture') {
+      // No microphone found
+      searchInput.placeholder = 'No microphone found.';
+    } else if (e.error === 'not-allowed') {
+      // User denied permission
+      searchInput.placeholder = 'Mic permission denied.';
+    } else {
+      // Generic error
+      console.error('Voice error:', e.error);
+      searchInput.placeholder = 'Error. Please type.';
+    }
   };
 } else {
-  // Hide button if browser doesn't support it (e.g. Firefox desktop)
+  // Hide button if browser doesn't support it
   if (btnVoice) btnVoice.style.display = 'none';
 }
 
-// Initialize
 initTheme();
 renderHistory();
